@@ -10,6 +10,16 @@ class FormValidation {
 											     url: /^(http(s?):\/\/)?(www\.)?[a-zA-Z0-9\.\-\_]+(\.[a-zA-Z]{2,3})+(\/[a-zA-Z0-9\_\-\s\.\/\?\%\#\&\=]*)?$/,
 											     tel: /^(?:(?:\+|00)33[\s.-]{0,3}(?:\(0\)[\s.-]{0,3})?|0)[1-9](?:(?:[\s.-]?\d{2}){4}|\d{2}(?:[\s.-]?\d{3}){2})$/
 									   };
+									   
+				static errorMessages = {
+											   email: 'L\'email saisi est invalide',
+											password: 'Ce mot de passe n\'est pas assez sécurisé',
+											    date: 'La date saisie est invalide',
+											  number: 'Le nombre saisi est invalide',
+											     url: 'L\'adresse URL saisie est invalide',
+											     tel: 'Le numéro de téléphone saisi est invalide',
+											   empty: 'Ce champ est obligatoire'
+									   };
 				
 				elementCollection = [];
 				
@@ -33,12 +43,20 @@ class FormValidation {
 							}
 						}
 						
+						/* For verification purpose */
 						console.log(this.elementCollection);
 						console.log(this.validFields);
 						console.log(this.cantBeBlank);
 						console.log(this.invalidFields);
 						
-						event.preventDefault();
+						this.clearAll();
+						
+						if (this.blankCheck.length > 0 || this.invalidFields.length > 0) {
+							event.preventDefault();
+							console.log('submission prevented');
+							this.displayErrors(this.cantBeBlank);
+							this.displayErrors(this.invalidFields);
+						}
 						
 						this.validFields = [];
 						this.cantBeBlank = [];
@@ -48,7 +66,6 @@ class FormValidation {
 				}
 				
 				collectFormElt() {
-				
 					for (const elt of FormValidation.eltHandled ) {
 						
 						if (this.form.querySelectorAll(elt).length > 0) {
@@ -88,6 +105,47 @@ class FormValidation {
 					}
 					return false;
 				
+				}
+				
+				displayErrors(fieldsArray) {
+					if (fieldsArray.length > 0) {
+						let i = 0;
+						for (const field of fieldsArray) {
+							i++;
+							let errorMsg = document.createElement('span');
+							errorMsg.classList.add('errorMsg');
+							if ( Array.isArray( field ) ) {
+								
+								errorMsg.setAttribute('id', 'invalid_' + field.nodeName + i);
+								if (field[1] === 'regex') {
+									errorMsg.textContent = FormValidation.errorMessages[ field[0].type ];
+								}
+								
+								field[0].insertAdjacentElement('afterend', errorMsg);
+								field[0].setAttribute('aria-invalid', 'true');
+								field[0].setAttribute('aria-errormessage', 'invalid_' + field.nodeName + i);
+								
+							} else {
+								errorMsg.setAttribute('id', 'blank_' +  field.nodeName + i);
+								errorMsg.textContent = FormValidation.errorMessages['empty'];
+								field.insertAdjacentElement('afterend', errorMsg);
+								field.setAttribute('aria-invalid', 'true');
+								field.setAttribute('aria-errormessage', 'blank_' +  field.nodeName + i);
+							}
+						}
+					}
+					return;
+				}
+				
+				clearAll() {
+					for (const elt of this.validFields) {
+						elt.removeAttribute('aria-invalid'); //Si l'attribut n'existe pas return sans générer d'erreur
+						elt.removeAttribute('aria-errormessage'); //Si l'attribut n'existe pas return sans générer d'erreur
+					}
+					let messages = document.querySelectorAll('span.errorMsg');
+					for (const msg of messages) {
+						msg.remove();
+					}
 				}
 				
 			}
