@@ -98,7 +98,6 @@ class FormValidation {
 						if (element.value.trim().length > 0 ) {
 							if (! element.value.match (FormValidation.usableRegex[element.type])) {
 								this.invalidFields.push([element, 'regex']);
-								console.log('invalid ' + element.type);
 								return true;
 							}
 						}
@@ -139,8 +138,8 @@ class FormValidation {
 				
 				clearAll() {
 					for (const elt of this.validFields) {
-						elt.removeAttribute('aria-invalid'); //Si l'attribut n'existe pas return sans générer d'erreur
-						elt.removeAttribute('aria-errormessage'); //Si l'attribut n'existe pas return sans générer d'erreur
+						elt.removeAttribute('aria-invalid'); //Si l'attribut n'existe pas, return sans générer d'erreur
+						elt.removeAttribute('aria-errormessage'); //Si l'attribut n'existe pas, return sans générer d'erreur
 					}
 					let messages = document.querySelectorAll('span.errorMsg');
 					for (const msg of messages) {
