@@ -20,7 +20,7 @@ class FormValidation {
 											     tel: 'Le numéro de téléphone saisi est invalide',
 											   empty: 'Ce champ est obligatoire'
 									   };
-				
+									   
 				elementCollection = [];
 				
 				validFields       = [];
@@ -51,7 +51,8 @@ class FormValidation {
 						
 						this.clearAll();
 						
-						if (this.blankCheck.length > 0 || this.invalidFields.length > 0) {
+						if (this.cantBeBlank.length > 0 || this.invalidFields.length > 0) {
+							
 							event.preventDefault();
 							console.log('submission prevented');
 							this.displayErrors(this.cantBeBlank);
@@ -66,6 +67,9 @@ class FormValidation {
 				}
 				
 				collectFormElt() {
+				
+					this.elementCollection = [];
+				
 					for (const elt of FormValidation.eltHandled ) {
 						
 						if (this.form.querySelectorAll(elt).length > 0) {
@@ -98,6 +102,7 @@ class FormValidation {
 						if (element.value.trim().length > 0 ) {
 							if (! element.value.match (FormValidation.usableRegex[element.type])) {
 								this.invalidFields.push([element, 'regex']);
+								console.log('invalid ' + element.type);
 								return true;
 							}
 						}
@@ -138,8 +143,8 @@ class FormValidation {
 				
 				clearAll() {
 					for (const elt of this.validFields) {
-						elt.removeAttribute('aria-invalid'); //Si l'attribut n'existe pas, return sans générer d'erreur
-						elt.removeAttribute('aria-errormessage'); //Si l'attribut n'existe pas, return sans générer d'erreur
+						elt.removeAttribute('aria-invalid'); //Si l'attribut n'existe pas return sans générer d'erreur
+						elt.removeAttribute('aria-errormessage'); //Si l'attribut n'existe pas return sans générer d'erreur
 					}
 					let messages = document.querySelectorAll('span.errorMsg');
 					for (const msg of messages) {
@@ -148,5 +153,32 @@ class FormValidation {
 				}
 				
 			}
-			
-			const contactForm = new FormValidation( document.querySelector('form') );
+			/*****************************************************************/
+			var contactForms  = document.querySelectorAll('form');
+			var formInstances = {};
+			for (let i = 0; i < contactForms.length; i++) {
+				formInstances[i] = new FormValidation(contactForms[i]);
+			}
+			/***********************************************************************/
+			const config = { attributes: false, childList: true, subtree: false };//Options pour le mutation observer, on s'occupe de la liste des enfants uniquement
+				
+			const observer = new MutationObserver(mutobs_callback);// On crée une instance du mutation observer
+				
+			function mutobs_callback(mutationList, observer) { //Fonction de callback du mutation observer
+							
+				for (const mutation of mutationList) {//Pour chaque mutation de la liste
+								
+					if (mutation.type === "childList") {//si la liste des noeuds enfant a été modifiée
+									
+						console.log('A mutation of the childNodes has been observed');
+						for (const [key, value] of Object.entries(formInstances)) {
+							value.collectFormElt();
+						}
+					}				
+				}
+								
+			}
+			//On lance la méthode d'observation du mutation observer
+			const eltList = document.querySelector('form'); //Noeud parent qui sera observé
+
+			observer.observe(eltList, config);
