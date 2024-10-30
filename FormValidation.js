@@ -2,7 +2,7 @@ class FormValidation {
 				
 				static eltHandled    = ['input', 'textarea', 'fieldset'];
 				
-				static usableRegex   = {
+				static usableRegex   = { //Expression régulières à utiliser pour le match
 											   email: /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
 											password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s])\S{8,}$/,
 											    date: /^((?:19|20)[0-9][0-9])-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$/,
@@ -11,7 +11,7 @@ class FormValidation {
 											     tel: /^(?:(?:\+|00)33[\s.-]{0,3}(?:\(0\)[\s.-]{0,3})?|0)[1-9](?:(?:[\s.-]?\d{2}){4}|\d{2}(?:[\s.-]?\d{3}){2})$/
 									   };
 									   
-				static errorMessages = {
+				static errorMessages = { //Messages d'erreur personnalisés
 											   email: 'L\'email saisi est invalide',
 											password: 'Ce mot de passe n\'est pas assez sécurisé',
 											    date: 'La date saisie est invalide',
@@ -28,14 +28,14 @@ class FormValidation {
 				invalidFields     = [];
 				
 				constructor( form ) {
-					this.form = form;
-					this.collectFormElt();
-					this.handleForm();
+					this.form = form; //Récupère le formulaire
+					this.collectFormElt(); //Collecte les éléments à valider
+					this.handleForm(); //Gère l'événement soumission
 				}
 				
 				handleForm() {
 				
-					this.form.addEventListener('submit', (event) => {
+					this.form.addEventListener('submit', (event) => { //On crée un écouteur sur l'événement soumission
 						
 						for (const elt of this.elementCollection) {
 							if ( this.blankCheck(elt) === false && this.regexCheck(elt) === false ) {
@@ -49,12 +49,12 @@ class FormValidation {
 						console.log(this.cantBeBlank);
 						console.log(this.invalidFields);
 						
-						this.clearAll();
+						this.clearAll(); //On clear les statuts invalides et les messages d'erreur
 						
 						if (this.cantBeBlank.length > 0 || this.invalidFields.length > 0) {
 							
-							event.preventDefault();
-							console.log('submission prevented');
+							event.preventDefault(); //On bloque la soumission du formulaire
+							console.log('submission prevented'); //For verification purpose
 							this.displayErrors(this.cantBeBlank);
 							this.displayErrors(this.invalidFields);
 						}
@@ -113,23 +113,21 @@ class FormValidation {
 				
 				displayErrors(fieldsArray) {
 					if (fieldsArray.length > 0) {
-						let i = 0;
+						let i = 0; //On met en place une incrémentation pour générer des id non redondantes
 						for (const field of fieldsArray) {
 							i++;
-							let errorMsg = document.createElement('span');
+							let errorMsg = document.createElement('span');//Création de l'élément qui va contenir le msg
 							errorMsg.classList.add('errorMsg');
-							if ( Array.isArray( field ) ) {
-								
-								errorMsg.setAttribute('id', 'invalid_' + field.nodeName + i);
-								if (field[1] === 'regex') {
-									errorMsg.textContent = FormValidation.errorMessages[ field[0].type ];
+							if ( Array.isArray( field ) ) { //Si le champ est un tableau alors l'erreur vient d'un match regex
+								errorMsg.setAttribute('id', 'invalid_' + field.nodeName + i); //Attribution de l'id
+								if (field[1] === 'regex') { //On se laisse la possibilité d'ajouter un autre type d'erreur
+									errorMsg.textContent = FormValidation.errorMessages[ field[0].type ];//On va chercher le message d'erreur dans la propriété statique errorMessages et on l'injecte
 								}
+								field[0].insertAdjacentElement('afterend', errorMsg); //On ajoute le message juste après l'élément invalide
+								field[0].setAttribute('aria-invalid', 'true'); //On ajoute l'attribut aria-invalid
+								field[0].setAttribute('aria-errormessage', 'invalid_' + field.nodeName + i); //On ajoute l'attribut aria-error message qui se réfère à l'id de l'élément invalide
 								
-								field[0].insertAdjacentElement('afterend', errorMsg);
-								field[0].setAttribute('aria-invalid', 'true');
-								field[0].setAttribute('aria-errormessage', 'invalid_' + field.nodeName + i);
-								
-							} else {
+							} else { // Sinon il s'agit d'un champ required vide
 								errorMsg.setAttribute('id', 'blank_' +  field.nodeName + i);
 								errorMsg.textContent = FormValidation.errorMessages['empty'];
 								field.insertAdjacentElement('afterend', errorMsg);
@@ -141,7 +139,7 @@ class FormValidation {
 					return;
 				}
 				
-				clearAll() {
+				clearAll() { //Supprime les attributs aria et l'ensemble des messages d'erreur
 					for (const elt of this.validFields) {
 						elt.removeAttribute('aria-invalid'); //Si l'attribut n'existe pas return sans générer d'erreur
 						elt.removeAttribute('aria-errormessage'); //Si l'attribut n'existe pas return sans générer d'erreur
@@ -154,31 +152,44 @@ class FormValidation {
 				
 			}
 			/*****************************************************************/
-			var contactForms  = document.querySelectorAll('form');
-			var formInstances = {};
+			var contactForms  = document.querySelectorAll('form'); //Collection de tous les formulaires de la page
+			var formInstances = {}; //Collection des futures instances FormValidation
 			for (let i = 0; i < contactForms.length; i++) {
-				formInstances[i] = new FormValidation(contactForms[i]);
+				formInstances[i] = new FormValidation(contactForms[i]); //On stocke les instances dans formTnstances
 			}
 			/***********************************************************************/
-			const config = { attributes: false, childList: true, subtree: false };//Options pour le mutation observer, on s'occupe de la liste des enfants uniquement
+			const config = { attributes: false, childList: true, subtree: false }; //Options pour le mutation observer, on s'occupe de la liste des enfants uniquement
 				
-			const observer = new MutationObserver(mutobs_callback);// On crée une instance du mutation observer
+			const observer = new MutationObserver(mutobs_callback); // On crée une instance du mutation observer
 				
 			function mutobs_callback(mutationList, observer) { //Fonction de callback du mutation observer
 							
-				for (const mutation of mutationList) {//Pour chaque mutation de la liste
+				for (const mutation of mutationList) { //Pour chaque mutation de la liste
 								
-					if (mutation.type === "childList") {//si la liste des noeuds enfant a été modifiée
-									
-						console.log('A mutation of the childNodes has been observed');
-						for (const [key, value] of Object.entries(formInstances)) {
-							value.collectFormElt();
+					if (mutation.type === "childList") { //Si la liste des noeuds enfant a été modifiée
+						for (const [key, value] of Object.entries(formInstances)) { //On parcourt les instances de FormValidation
+							value.collectFormElt(); //On relance la méthode de récupération des éléments du formulaire pour inclure les éventuels nouveaux éléments
 						}
 					}				
 				}
 								
 			}
-			//On lance la méthode d'observation du mutation observer
+			//On lance la méthode d'observation de l'instance mutation observer
 			const eltList = document.querySelector('form'); //Noeud parent qui sera observé
-
 			observer.observe(eltList, config);
+			
+			/*********** SIMULATION D'UNE CHAMP REPETABLE ***********/
+			const createElt = document.getElementById('createElt');
+			createElt.addEventListener('click', (event) => {
+				let container  = document.createElement('div');
+				let info       = document.createElement('label');
+				console.log(container);
+				info.textContent = 'Repeatable field simulation';
+				container.append(info);
+				let field      = document.createElement('input');
+				field.type       = 'text';
+				field.setAttribute('aria-required', 'true');
+				container.append(field);
+				let theForm = document.querySelector('form');
+				theForm.append(container);
+			});
