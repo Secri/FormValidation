@@ -128,7 +128,7 @@ class FormValidation {
 				}
 				
 				correctionListener(element) {
-					const currentContent = element.value.trim();
+					let currentContent = element.value.trim();
 					element.addEventListener('input', (event) => {
 						if (element.value.trim().length === 0 || element.value.trim() != currentContent ) {
 							element.removeAttribute('aria-invalid');
@@ -176,20 +176,6 @@ class FormValidation {
 								
 			}
 			//On lance la méthode d'observation de l'instance mutation observer
-			const eltList = document.querySelector('form'); //Noeud parent qui sera observé
-			observer.observe(eltList, config);
-			
-			/*********** SIMULATION D'UN CHAMP REPETABLE ***********/
-			const createElt = document.getElementById('createElt');
-			createElt.addEventListener('click', (event) => {
-				let container  = document.createElement('div');
-				let info       = document.createElement('label');
-				info.textContent = 'Repeatable field simulation';
-				container.append(info);
-				let field      = document.createElement('input');
-				field.type       = 'text';
-				field.setAttribute('aria-required', 'true');
-				container.append(field);
-				let theForm = document.querySelector('form');
-				theForm.append(container);
-			});
+			for (const form of contactForms) {
+				observer.observe(form, config);
+			}
