@@ -179,7 +179,7 @@ class FormValidation {
 			const eltList = document.querySelector('form'); //Noeud parent qui sera observé
 			observer.observe(eltList, config);
 			
-			/*********** SIMULATION D'UNE CHAMP REPETABLE ***********/
+			/*********** SIMULATION D'UN CHAMP REPETABLE ***********/
 			const createElt = document.getElementById('createElt');
 			createElt.addEventListener('click', (event) => {
 				let container  = document.createElement('div');
