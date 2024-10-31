@@ -22,7 +22,6 @@ class FormValidation {
 									   };
 									   
 				elementCollection = [];
-				
 				validFields       = [];
 				cantBeBlank       = [];
 				invalidFields     = [];
@@ -52,7 +51,6 @@ class FormValidation {
 						this.clearAll(); //On clear les statuts invalides et les messages d'erreur
 						
 						if (this.cantBeBlank.length > 0 || this.invalidFields.length > 0) {
-							
 							event.preventDefault(); //On bloque la soumission du formulaire
 							console.log('submission prevented'); //For verification purpose
 							this.displayErrors(this.cantBeBlank);
@@ -67,37 +65,25 @@ class FormValidation {
 				}
 				
 				collectFormElt() {
-				
 					this.elementCollection = [];
-				
 					for (const elt of FormValidation.eltHandled ) {
-						
 						if (this.form.querySelectorAll(elt).length > 0) {
-						
 							for (const child of this.form.querySelectorAll(elt)) {
-								
 								this.elementCollection.push(child);
-								
 							}
-						
 						}
-						
 					}
-
 				}
 				
 				blankCheck(element) {
-					
 					if (element.value.trim().length === 0 && element.getAttribute('aria-required') === 'true') {
 						this.cantBeBlank.push(element);
 						return true;
 					}
 					return false;
-					
 				}
 				
 				regexCheck(element) {
-				
 					if (element.tagName === 'INPUT' && element.type != 'text') {
 						if (element.value.trim().length > 0 ) {
 							if (! element.value.match (FormValidation.usableRegex[element.type])) {
@@ -108,7 +94,6 @@ class FormValidation {
 						}
 					}
 					return false;
-				
 				}
 				
 				displayErrors(fieldsArray) {
@@ -126,6 +111,7 @@ class FormValidation {
 								field[0].insertAdjacentElement('afterend', errorMsg); //On ajoute le message juste après l'élément invalide
 								field[0].setAttribute('aria-invalid', 'true'); //On ajoute l'attribut aria-invalid
 								field[0].setAttribute('aria-errormessage', 'invalid_' + field.nodeName + i); //On ajoute l'attribut aria-error message qui se réfère à l'id de l'élément invalide
+								this.correctionListener(field[0]);
 								
 							} else { // Sinon il s'agit d'un champ required vide
 								errorMsg.setAttribute('id', 'blank_' +  field.nodeName + i);
@@ -133,10 +119,24 @@ class FormValidation {
 								field.insertAdjacentElement('afterend', errorMsg);
 								field.setAttribute('aria-invalid', 'true');
 								field.setAttribute('aria-errormessage', 'blank_' +  field.nodeName + i);
+								this.correctionListener(field);
 							}
 						}
 					}
 					return;
+				}
+				
+				correctionListener(element) {
+					const currentContent = element.value.trim();
+					element.addEventListener('input', (event) => {
+						if (element.value.trim().length === 0 || element.value.trim() != currentContent ) {
+							element.removeAttribute('aria-invalid');
+							element.removeAttribute('aria-errormessage');
+							if (element.nextElementSibling && element.nextElementSibling.classList.contains('errorMsg')) {
+								element.nextElementSibling.remove();
+							}
+						}
+					});
 				}
 				
 				clearAll() { //Supprime les attributs aria et l'ensemble des messages d'erreur
