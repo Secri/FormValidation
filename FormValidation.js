@@ -184,7 +184,6 @@ class FormValidation {
 			createElt.addEventListener('click', (event) => {
 				let container  = document.createElement('div');
 				let info       = document.createElement('label');
-				console.log(container);
 				info.textContent = 'Repeatable field simulation';
 				container.append(info);
 				let field      = document.createElement('input');
