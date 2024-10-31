@@ -76,7 +76,8 @@ class FormValidation {
 				}
 				
 				blankCheck(element) {
-					if (element.value.trim().length === 0 && element.getAttribute('aria-required') === 'true') {
+					element.value = element.value.trim();
+					if (element.value.length === 0 && element.getAttribute('aria-required') === 'true') {
 						this.cantBeBlank.push(element);
 						return true;
 					}
@@ -84,11 +85,11 @@ class FormValidation {
 				}
 				
 				regexCheck(element) {
-					if (element.tagName === 'INPUT' && element.type != 'text') {
-						if (element.value.trim().length > 0 ) {
+					element.value = element.value.trim();
+					if (element.value.length > 0 ) {
+						if (element.tagName === 'INPUT' && element.type != 'text') {	
 							if (! element.value.match (FormValidation.usableRegex[element.type])) {
 								this.invalidFields.push([element, 'regex']);
-								console.log('invalid ' + element.type);
 								return true;
 							}
 						}
