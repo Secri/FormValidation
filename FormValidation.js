@@ -3,6 +3,7 @@ class FormValidation {
 				static eltHandled    = ['input', 'textarea', 'fieldset'];
 				
 				static usableRegex   = { //Expression régulières à utiliser pour le match
+											    text: /^[ -~¡-ÿ]+$/, //Caractères unicodes acceptés pour les langues latines
 											   email: /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
 											password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s])\S{8,}$/,
 											    date: /^((?:19|20)[0-9][0-9])-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$/,
@@ -12,6 +13,7 @@ class FormValidation {
 									   };
 									   
 				static errorMessages = { //Messages d'erreur personnalisés
+											    text: 'L\'un des caractères saisis est invalide',
 											   email: 'L\'email saisi est invalide',
 											password: 'Ce mot de passe n\'est pas assez sécurisé',
 											    date: 'La date saisie est invalide',
@@ -87,7 +89,7 @@ class FormValidation {
 				regexCheck(element) {
 					element.value = element.value.trim();
 					if (element.value.length > 0 ) {
-						if (element.tagName === 'INPUT' && element.type != 'text') {	
+						if (element.tagName === 'INPUT') {	
 							if (! element.value.match (FormValidation.usableRegex[element.type])) {
 								this.invalidFields.push([element, 'regex']);
 								return true;
@@ -179,3 +181,18 @@ class FormValidation {
 			for (const form of contactForms) {
 				observer.observe(form, config);
 			}
+			
+			/*********** SIMULATION D'UN CHAMP REPETABLE ***********/
+			const createElt = document.getElementById('createElt');
+			createElt.addEventListener('click', (event) => {
+				let container  = document.createElement('div');
+				let info       = document.createElement('label');
+				info.textContent = 'Repeatable field simulation';
+				container.append(info);
+				let field      = document.createElement('input');
+				field.type       = 'text';
+				field.setAttribute('aria-required', 'true');
+				container.append(field);
+				let theForm = document.querySelector('form');
+				theForm.append(container);
+			});
