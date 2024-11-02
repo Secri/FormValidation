@@ -1,26 +1,43 @@
 <html>
 	<head>
-    <script type="text/javascript" src="FormValidation.js" defer></script>
-    <link rel="stylesheet" href="FormValidation.css">
-  </head>
+		<script type="text/javascript" src="FormValidation.js" defer></script>
+		<link rel="stylesheet" href="FormValidation.css">
+	</head>
 	<body>
 		<form>
 			<div>
-				<label>Identité</label><br>
-				<input type="text"  placeholder="Prénom" aria-required="true"/><br>
-				<input type="text"  placeholder="Nom"/><br>
-				<input type="email" placeholder="Adresse e-mail"/><br>
-				<input type="number"  placeholder="Votre âge"/><br>
-				<input type="password" placeholder="Entrez votre mot de passe"/><br>
-				<input type="date"/><br>
+				<label>Identité</label>
+				<input type="text"  placeholder="Prénom" aria-required="true"/>
+				<input type="text"  placeholder="Nom"/>
 			</div>
-			&nbsp;
 			<div>
-				<label>Message</label><br>
+				<label>Informations de contact</label>
+				<input type="email" placeholder="Adresse e-mail" aria-required="true"/>
+				<input type="tel" placeholder="Numéro de téléphone"/>
+			</div>
+			<div>
+				<label>Créez un mot de passe (doit contenir au minimum 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère non-alphanumérique).</label>
+				<input type="password" placeholder="Entrez votre mot de passe" aria-required="true"/>
+			</div>
+			<div>
+				<label>Site web</label>
+				<input type="url" placeholder="Adresse url de votre site"/>
+			</div>	
+			<div>
+				<label>Date de naissance</label>
+				<input type="date"/>
+			</div>
+			<div>
+				<label>Distance maximale à laquelle vous pouvez vous déplacer</label>
+				<input type="number"  placeholder="Distance max en km"/>
+			</div>
+			<div>
+				<label>Vos commentaires</label>
 				<textarea placeholder="Tapez votre message, 500 caractères max" maxlength="500" aria-required="true"></textarea>
 			</div>
-			&nbsp;
 			<button type="submit">Envoyer</button>
 		</form>
-  </body>
+		<hr>
+		<button type="submit" id="createElt">Créer un élément</button>
+	</body>
 </html>
