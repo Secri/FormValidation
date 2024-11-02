@@ -1,1 +1,15 @@
-
+input {
+	padding:0.2rem;
+	display:block
+}
+		
+[aria-invalid="true"] {
+	outline: dashed red;
+	background-color:rgba(255,0,0,0.2)
+}
+			
+[aria-invalid="true"] ~ .errorMsg {
+	color:red;
+	display:block;
+	margin-top: 0.2rem
+}
