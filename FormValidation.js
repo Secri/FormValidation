@@ -187,12 +187,12 @@ class FormValidation {
 			createElt.addEventListener('click', (event) => {
 				let container  = document.createElement('div');
 				let info       = document.createElement('label');
-				info.textContent = 'Repeatable field simulation';
+				info.textContent = "Simulation d'un champ répétable";
 				container.append(info);
 				let field      = document.createElement('input');
 				field.type       = 'text';
 				field.setAttribute('aria-required', 'true');
 				container.append(field);
-				let theForm = document.querySelector('form');
-				theForm.append(container);
+				let submitButton = document.querySelector('form button');
+				submitButton.insertAdjacentElement('beforebegin', container);
 			});
