@@ -20,7 +20,8 @@ class FormValidation {
 											  number: 'Le nombre saisi est invalide',
 											     url: 'L\'adresse URL saisie est invalide',
 											     tel: 'Le numéro de téléphone saisi est invalide',
-											   empty: 'Ce champ est obligatoire'
+											   empty: 'Ce champ est obligatoire',
+											   check: 'Veuillez sélectionner au moins une option'
 									   };
 									   
 				elementCollection = [];
@@ -37,10 +38,28 @@ class FormValidation {
 				handleForm() {
 				
 					this.form.addEventListener('submit', (event) => { //On crée un écouteur sur l'événement soumission
-						
+											
 						for (const elt of this.elementCollection) {
-							if ( this.blankCheck(elt) === false && this.regexCheck(elt) === false ) {
-								this.validFields.push(elt);
+							switch (elt.tagName) {
+								case 'INPUT':
+									for (const property in FormValidation.usableRegex) {
+										if (elt.type == property) {
+											if ( this.blankCheck(elt) === false && this.regexCheck(elt) === false ) {
+												this.validFields.push(elt);
+											}
+										}
+									}
+									break;
+								case 'TEXTAREA':
+									if ( this.blankCheck(elt) === false ) {
+										this.validFields.push(elt);
+									}
+									break;
+								case 'FIELDSET':
+									if ( this.fieldsetCheck(elt) === false ) {
+										this.validFields.push(elt);
+									}
+									break;
 							}
 						}
 						
@@ -75,6 +94,7 @@ class FormValidation {
 							}
 						}
 					}
+					console.log(this.elementCollection);
 				}
 				
 				blankCheck(element) {
@@ -99,6 +119,20 @@ class FormValidation {
 					return false;
 				}
 				
+				fieldsetCheck(element) {
+					if (element.getAttribute('aria-required') === 'true') {
+						const eltCollection = element.querySelectorAll('input');
+						for (const elt of eltCollection) {
+							if (elt.checked) {
+								return false;
+							}
+						}
+						this.invalidFields.push([element, 'check']);
+						return true;
+					}
+					return false;
+				}
+				
 				displayErrors(fieldsArray) {
 					if (fieldsArray.length > 0) {
 						let i = 0; //On met en place une incrémentation pour générer des id non redondantes
@@ -108,8 +142,10 @@ class FormValidation {
 							errorMsg.classList.add('errorMsg');
 							if ( Array.isArray( field ) ) { //Si le champ est un tableau alors l'erreur vient d'un match regex
 								errorMsg.setAttribute('id', 'invalid_' + field.nodeName + i); //Attribution de l'id
-								if (field[1] === 'regex') { //On se laisse la possibilité d'ajouter un autre type d'erreur
+								if (field[1] === 'regex') {
 									errorMsg.textContent = FormValidation.errorMessages[ field[0].type ];//On va chercher le message d'erreur dans la propriété statique errorMessages et on l'injecte
+								} else if (field[1] === 'check') {
+									errorMsg.textContent = FormValidation.errorMessages['check'];
 								}
 								field[0].insertAdjacentElement('afterend', errorMsg); //On ajoute le message juste après l'élément invalide
 								field[0].setAttribute('aria-invalid', 'true'); //On ajoute l'attribut aria-invalid
@@ -130,16 +166,27 @@ class FormValidation {
 				}
 				
 				correctionListener(element) {
-					let currentContent = element.value.trim();
-					element.addEventListener('input', (event) => {
-						if (element.value.trim().length === 0 || element.value.trim() != currentContent ) {
+					if (element.tagName != 'FIELDSET') {
+						let currentContent = element.value.trim();
+						element.addEventListener('input', (event) => {
+							if (element.value.trim().length === 0 || element.value.trim() != currentContent ) {
+								element.removeAttribute('aria-invalid');
+								element.removeAttribute('aria-errormessage');
+								if (element.nextElementSibling && element.nextElementSibling.classList.contains('errorMsg')) {
+									element.nextElementSibling.remove();
+								}
+							}
+						});
+					}
+					if (element.tagName === 'FIELDSET') {
+						element.addEventListener('change', (event) => {
 							element.removeAttribute('aria-invalid');
 							element.removeAttribute('aria-errormessage');
 							if (element.nextElementSibling && element.nextElementSibling.classList.contains('errorMsg')) {
 								element.nextElementSibling.remove();
 							}
-						}
-					});
+						});
+					}
 				}
 				
 				clearAll() { //Supprime les attributs aria et l'ensemble des messages d'erreur
@@ -153,7 +200,8 @@ class FormValidation {
 					}
 				}
 				
-			}
+			}			
+			
 			/*****************************************************************/
 			var contactForms  = document.querySelectorAll('form'); //Collection de tous les formulaires de la page
 			var formInstances = {}; //Collection des futures instances FormValidation
