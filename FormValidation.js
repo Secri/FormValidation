@@ -62,11 +62,6 @@ class FormValidation {
 							}
 						}
 						
-						/* For verification purpose */
-						console.log(this.elementCollection);
-						console.log(this.validFields);
-						console.log(this.invalidFields);
-						
 						this.clearAll(); //On clear les statuts invalides et les messages d'erreur
 						
 						if (this.invalidFields.length > 0) {
