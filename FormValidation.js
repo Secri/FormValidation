@@ -85,7 +85,6 @@ class FormValidation {
 							}
 						}
 					}
-					console.log(this.elementCollection); //For verification purpose
 				}
 				
 				blankCheck(element) {
