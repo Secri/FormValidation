@@ -187,13 +187,12 @@ class FormValidation {
 			
 			}
 						
-			/*****************************************************************/
+			/*************************** MUTATION OBSERVER **************************************/
 			var contactForms  = document.querySelectorAll('form'); //Collection de tous les formulaires de la page
 			var formInstances = {}; //Collection des futures instances FormValidation
 			for (let i = 0; i < contactForms.length; i++) {
 				formInstances[i] = new FormValidation(contactForms[i]); //On stocke les instances dans formTnstances
 			}
-			/***********************************************************************/
 			const config = { attributes: false, childList: true, subtree: false }; //Options pour le mutation observer, on s'occupe de la liste des enfants uniquement
 				
 			const observer = new MutationObserver(mutobs_callback); // On crée une instance du mutation observer
